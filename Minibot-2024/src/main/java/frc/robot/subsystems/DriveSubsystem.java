@@ -54,7 +54,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
-
     m_leftEncoder.setDistancePerPulse(DriveConstants.WheelDiameterMeters * Math.PI / DriveConstants.EncoderTicksPerPulse);
     m_rightEncoder.setDistancePerPulse(DriveConstants.WheelDiameterMeters * Math.PI / DriveConstants.EncoderTicksPerPulse);
 
@@ -85,6 +84,8 @@ public class DriveSubsystem extends SubsystemBase {
     left.setInverted(true);
     right.setInverted(false);
 
+    //currentAngle = Math.IEEEremainder(m_gyro.getAngle(), 360);
+
   }
 
   @Override
@@ -97,6 +98,7 @@ public class DriveSubsystem extends SubsystemBase {
     );
 
     m_fieldSim.setRobotPose(getPose());
+
   }
 
   @Override
@@ -119,6 +121,8 @@ public class DriveSubsystem extends SubsystemBase {
     m_rightEncoderSim.setRate(m_driveTrainSim.getRightVelocityMetersPerSecond());
 
     m_gyroSim.setAngle(-m_driveTrainSim.getHeading().getDegrees());
+
+    SmartDashboard.putNumber("angle", getHeading());
 
   }
 
@@ -147,5 +151,6 @@ public class DriveSubsystem extends SubsystemBase {
     left.set(power);
     right.set(-power);
   }
+
 
 }
