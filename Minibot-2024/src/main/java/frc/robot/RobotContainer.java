@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.IOConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.DriveShape;
@@ -25,8 +26,8 @@ public class RobotContainer {
     m_driveSubsystem.setDefaultCommand(
       new RunCommand(
         () -> m_driveSubsystem.driveArcade(
-          m_driverController.getRawAxis(1), 
-          m_driverController.getRawAxis(0)),
+          m_driverController.getRawAxis(1) * DriveConstants.speedMultiplier, 
+          m_driverController.getRawAxis(0) * DriveConstants.speedMultiplier),
           m_driveSubsystem
       ));    
   }

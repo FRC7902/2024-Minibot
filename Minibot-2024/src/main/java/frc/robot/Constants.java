@@ -19,8 +19,10 @@ public final class Constants {
   }
 
   public static class DriveConstants{
+
+    public static final double speedMultiplier = 0.25;
     public static final int[] LeftMotorCAN = {13, 14};
-    public static final int[] RightMotorCAN = {15, 16};
+    public static final int[] RightMotorCAN = {11, 12};
 
     public static final int[] LeftEncoderCAN = {0, 1};
     public static final int[] RightEncoderCAN = {2, 3};
