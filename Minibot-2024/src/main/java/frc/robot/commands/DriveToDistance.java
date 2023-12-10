@@ -5,33 +5,87 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj2.command.PIDCommand;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
-// NOTE:  Consider using this command inline, rather than writing a subclass.  For more
-// information, see:
-// https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class DriveToDistance extends PIDCommand {
+public class DriveToDistance extends CommandBase {
+
+  private final DriveSubsystem m_driveSubsystem;
+  private final double targetDistance;
+
+  private final PIDController drivePID = new PIDController(1, 0, 0);
+  private double initialPositionX;
+  private double initialPositionY;
+  private double angle;
 
   /** Creates a new DriveToDistance. */
-  public DriveToDistance(DriveSubsystem driveSubsystem, double distance) {
-    super(
-        new PIDController(0.5, 0.5, 0.1),
-        // This should return the measurement
-        driveSubsystem::getPosition,
-        // This should return the setpoint (can also be a constant)
-        distance,
-        // This uses the output
-        output -> driveSubsystem.driveRaw(output),
-        driveSubsystem
-        );
+  public DriveToDistance(DriveSubsystem drive, double distance) {
+    m_driveSubsystem = drive;
+    targetDistance = distance;
+    m_driveSubsystem.resetEncoders();
+    drivePID.setTolerance(0.01, 1);
+    //addRequirements(drive);
+    
+    initialPositionX = m_driveSubsystem.getDisplacementX();
+    initialPositionY = m_driveSubsystem.getDisplacementY();
+    angle = m_driveSubsystem.getHeading();
+
     // Use addRequirements() here to declare subsystem dependencies.
-    // Configure additional PID options by calling `getController` here.
   }
+
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {
+
+    initialPositionX = m_driveSubsystem.getDisplacementX();
+    initialPositionY = m_driveSubsystem.getDisplacementY();
+    angle = m_driveSubsystem.getHeading();
+
+  }
+
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {
+    double speed;
+
+    if((45 < angle && angle < 135) || (225 < angle && angle < 315)){
+      speed = drivePID.calculate(m_driveSubsystem.getDisplacementY(), initialPositionY + (targetDistance * sin(angle)));
+
+      if(sin(angle) < 0){
+        m_driveSubsystem.driveRaw(-speed);
+      }else{
+        m_driveSubsystem.driveRaw(speed);
+      }
+
+    }else{
+      speed = drivePID.calculate(m_driveSubsystem.getDisplacementX(), initialPositionX + (targetDistance * cos(angle)));
+
+      if(cos(angle) < 0){
+        m_driveSubsystem.driveRaw(-speed);
+      }else{
+        m_driveSubsystem.driveRaw(speed);
+      }
+
+    }
+
+  }
+
+  public double cos(double angle){
+    return Math.cos(Math.toRadians(angle));
+  }
+
+  public double sin(double angle){
+    return Math.sin(Math.toRadians(angle));
+  }
+
+
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return getController().atSetpoint();
+    return drivePID.atSetpoint();
   }
 }

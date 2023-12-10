@@ -17,15 +17,15 @@ public class DriveShape extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new TurnToAngle(drive, 0),
+      new TurnToAngle(drive, 0, false),
       new DriveToDistance(drive, 5),
-      new TurnToAngle(drive, 90),
+      new TurnToAngle(drive, 90, false),
       new DriveToDistance(drive, 5),
-      new TurnToAngle(drive, 180),      
+      new TurnToAngle(drive, 180, false),      
       new DriveToDistance(drive, 5),
-      new TurnToAngle(drive, 270),      
+      new TurnToAngle(drive, 270, false),      
       new DriveToDistance(drive, 5),
-      new TurnToAngle(drive, 0)
+      new TurnToAngle(drive, 0, false)
     );
   }
 }

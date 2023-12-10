@@ -6,48 +6,95 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.PIDCommand;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
-// NOTE:  Consider using this command inline, rather than writing a subclass.  For more
-// information, see:
-// https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class TurnToAngle extends PIDCommand {
-  /** Creates a new TurnToAngle. */
-  public TurnToAngle(DriveSubsystem driveSubsystem, double angle) {
-    
-    super(
-        // The controller that the command will use
+public class TurnToAngle extends CommandBase {
 
-    //ku = 0.17
-    //tu = 0.1
+  private final DriveSubsystem m_driveSubsystem;
+  private final double targetAngle;
+  private double trueTarget;
+  private final PIDController turnPID = new PIDController(0.102, 2.04, 0.001275);
 
-    //kp = 0.6 * ku
-    //ki = (1.2 * ku) / tu
-    //kd = ku * tu * 0.075
+  private boolean isAdditive;
+  private double initialAngle;
+  private int direction;
+  /** Creates a new TurnToAngleB. */
+  public TurnToAngle(DriveSubsystem drive, double angle, boolean IsAdditive) {
 
-        new PIDController(0.102, 2.04, 0.001275),
-        // This should return the measurement
-        driveSubsystem::getHeading,
-        // This should return the setpoint (can also be a constant)
-        angle,
-        // This uses the output
-        output -> {
-          driveSubsystem.turn(output);
-        });
+    m_driveSubsystem = drive;
+    targetAngle = angle;
+    isAdditive = IsAdditive;
+    turnPID.setTolerance(0.01, 1);
 
-    getController().setTolerance(0.1, 1);
 
-    SmartDashboard.putNumber("angle 2", driveSubsystem.getHeading());
+    initialAngle = convertRange(m_driveSubsystem.getHeading());
 
-    getController().enableContinuousInput(0, 360);
     // Use addRequirements() here to declare subsystem dependencies.
-    // Configure additional PID options by calling `getController` here.
   }
+
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {
+    initialAngle = convertRange(m_driveSubsystem.getHeading());
+
+    double trueAngle = initialAngle - targetAngle;
+
+    trueAngle = convertRange(modAngle(trueAngle));
+    
+    if(isAdditive){
+      trueTarget = Math.round(convertRange(modAngle(targetAngle + initialAngle)));
+    }else{
+      trueTarget = targetAngle;
+    }
+
+    if(trueAngle < 180){
+      direction = 1;
+    }else{
+      direction = 1;
+    }
+
+
+  }
+
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {
+
+    double speed;
+
+    SmartDashboard.putNumber("Target angle", trueTarget);
+
+    if(trueTarget > 340 || trueTarget < 20){
+      speed = turnPID.calculate(m_driveSubsystem.getHeading(), trueTarget);
+      m_driveSubsystem.turn(direction * speed);
+
+    }else{
+      speed = turnPID.calculate(convertRange(m_driveSubsystem.getHeading()), convertRange(trueTarget));
+      m_driveSubsystem.turn(direction * speed);
+
+    }
+  }
+
+  public double convertRange(double angle){
+    if(angle < 0){
+      return angle + 360;
+    }else{
+      return angle;
+    }
+  }
+
+  public double modAngle(double angle){
+    return Math.IEEEremainder(angle, 360);
+  }
+
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return getController().atSetpoint();
+    return turnPID.atSetpoint();
   }
 }

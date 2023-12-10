@@ -36,8 +36,9 @@ public class RobotContainer {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
 
     new JoystickButton(m_driverController, IOConstants.kA).onTrue(new DriveToDistance(m_driveSubsystem, 5));
-    new JoystickButton(m_driverController, IOConstants.kB).onTrue(new TurnToAngle(m_driveSubsystem, 90));
-    new JoystickButton(m_driverController, IOConstants.kX).onTrue(new DriveShape(m_driveSubsystem));
+    new JoystickButton(m_driverController, IOConstants.kB).onTrue(new TurnToAngle(m_driveSubsystem, 90, false));
+    new JoystickButton(m_driverController, IOConstants.kX).onTrue(new TurnToAngle(m_driveSubsystem, 0, false));
+
 
   }
 
