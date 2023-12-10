@@ -28,7 +28,7 @@ public class DriveToDistance extends CommandBase {
     
     initialPositionX = m_driveSubsystem.getDisplacementX();
     initialPositionY = m_driveSubsystem.getDisplacementY();
-    angle = m_driveSubsystem.getHeading();
+    angle = convertRange(m_driveSubsystem.getHeading());
 
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -39,7 +39,8 @@ public class DriveToDistance extends CommandBase {
 
     initialPositionX = m_driveSubsystem.getDisplacementX();
     initialPositionY = m_driveSubsystem.getDisplacementY();
-    angle = m_driveSubsystem.getHeading();
+    angle = convertRange(m_driveSubsystem.getHeading());
+
 
   }
 
@@ -78,6 +79,13 @@ public class DriveToDistance extends CommandBase {
     return Math.sin(Math.toRadians(angle));
   }
 
+  public double convertRange(double angle){
+    if(angle < 0){
+      return angle + 360;
+    }else{
+      return angle;
+    }
+  }
 
   // Called once the command ends or is interrupted.
   @Override

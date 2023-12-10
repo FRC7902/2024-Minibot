@@ -64,7 +64,7 @@ public class DriveSubsystem extends SubsystemBase {
       m_gyro.getRotation2d(), 
       m_leftEncoder.getDistance(), 
       m_rightEncoder.getDistance(), 
-      new Pose2d(5.0, 5.0, new Rotation2d())
+      new Pose2d(0, 0, new Rotation2d())
       );
 
       m_driveTrainSim = DifferentialDrivetrainSim.createKitbotSim(
@@ -135,7 +135,7 @@ public class DriveSubsystem extends SubsystemBase {
     right.set(power);
   }
 
-  public double getHeading(){
+  public double getHeading(){//-180,180
     return Math.IEEEremainder(m_gyro.getAngle(), 360);
   }
 

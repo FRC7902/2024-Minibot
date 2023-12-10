@@ -38,7 +38,7 @@ public class TurnToAngle extends CommandBase {
   public void initialize() {
     initialAngle = convertRange(m_driveSubsystem.getHeading());
 
-    double trueAngle = initialAngle - targetAngle;
+    double trueAngle = targetAngle - initialAngle;
 
     trueAngle = convertRange(modAngle(trueAngle));
     
@@ -66,11 +66,11 @@ public class TurnToAngle extends CommandBase {
     SmartDashboard.putNumber("Target angle", trueTarget);
 
     if(trueTarget > 340 || trueTarget < 20){
-      speed = turnPID.calculate(m_driveSubsystem.getHeading(), trueTarget);
+      speed = turnPID.calculate(m_driveSubsystem.getHeading(), trueTarget);//-180 to 180
       m_driveSubsystem.turn(direction * speed);
 
     }else{
-      speed = turnPID.calculate(convertRange(m_driveSubsystem.getHeading()), convertRange(trueTarget));
+      speed = turnPID.calculate(convertRange(m_driveSubsystem.getHeading()), convertRange(trueTarget)); //0 to 360
       m_driveSubsystem.turn(direction * speed);
 
     }
