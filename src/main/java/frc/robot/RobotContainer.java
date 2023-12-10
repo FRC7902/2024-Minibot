@@ -4,15 +4,11 @@
 
 package frc.robot;
 
-import frc.robot.Constants.IOConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.DriveShape;
-import frc.robot.commands.DriveToDistance;
-import frc.robot.commands.TurnToAngle;
 import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
 
 public class RobotContainer {
 
@@ -32,11 +28,6 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-
-    new JoystickButton(m_driverController, IOConstants.kA).onTrue(new DriveToDistance(m_driveSubsystem, 5));
-    new JoystickButton(m_driverController, IOConstants.kB).onTrue(new TurnToAngle(m_driveSubsystem, 90));
-    new JoystickButton(m_driverController, IOConstants.kX).onTrue(new DriveShape(m_driveSubsystem));
 
   }
 
