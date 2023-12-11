@@ -24,9 +24,6 @@ public final class Constants {
     public static final int[] LeftMotorCAN = {13, 14};
     public static final int[] RightMotorCAN = {11, 12};
 
-    public static final int[] LeftEncoderCAN = {0, 1};
-    public static final int[] RightEncoderCAN = {2, 3};
-
     public static final int GyroCAN = 1;
 
     public static final double WheelDiameterMeters = 0.1524;

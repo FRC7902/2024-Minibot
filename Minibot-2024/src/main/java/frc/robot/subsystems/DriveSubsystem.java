@@ -39,15 +39,16 @@ public class DriveSubsystem extends SubsystemBase {
 
   private final DifferentialDrive m_drive = new DifferentialDrive(left, right);
 
-  //private final Encoder m_rightEncoder = new Encoder(DriveConstants.RightEncoderCAN[0], DriveConstants.RightEncoderCAN[1]);
-
   private final RelativeEncoder m_leftEncoder = m_leftA.getEncoder();
   private final RelativeEncoder m_rightEncoder = m_leftB.getEncoder();
 
   private final AnalogGyro m_gyro = new AnalogGyro(DriveConstants.GyroCAN);
+  private DifferentialDriveOdometry m_odometry;
 
   //SIMULATION:
-  private DifferentialDriveOdometry m_odometry;
+  private final Encoder m_leftEncoderObj = new Encoder(0, 1);
+  private final Encoder m_rightEncoderObj = new Encoder(2, 3);
+  private DifferentialDriveOdometry m_odometrySim;
   private EncoderSim m_leftEncoderSim;
   private EncoderSim m_rightEncoderSim;
   private AnalogGyroSim m_gyroSim;
@@ -57,6 +58,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+
     m_leftEncoder.setPositionConversionFactor(DriveConstants.WheelDiameterMeters * Math.PI / DriveConstants.EncoderTicksPerPulse);
     m_rightEncoder.setPositionConversionFactor(DriveConstants.WheelDiameterMeters * Math.PI / DriveConstants.EncoderTicksPerPulse);
 
@@ -66,7 +68,29 @@ public class DriveSubsystem extends SubsystemBase {
     m_odometry = new DifferentialDriveOdometry(
       m_gyro.getRotation2d(), 
       m_leftEncoder.getPosition(), 
-      m_rightEncoder.getPosition(), 
+      m_rightEncoder.getPosition()
+      );
+
+    left.setInverted(true);
+    right.setInverted(false);
+
+    m_leftA.setSmartCurrentLimit(45);
+    m_leftB.setSmartCurrentLimit(45);
+    m_rightA.setSmartCurrentLimit(45);
+    m_rightB.setSmartCurrentLimit(45);
+
+
+//------------------------------------------SIMULATION--------------------------------------------------------------------
+    m_leftEncoderObj.setDistancePerPulse(DriveConstants.WheelDiameterMeters * Math.PI / DriveConstants.EncoderTicksPerPulse);
+    m_rightEncoderObj.setDistancePerPulse(DriveConstants.WheelDiameterMeters * Math.PI / DriveConstants.EncoderTicksPerPulse);
+    
+    m_leftEncoderObj.reset();
+    m_rightEncoderObj.reset();
+    
+    m_odometrySim = new DifferentialDriveOdometry(
+      m_gyro.getRotation2d(), 
+      m_leftEncoderObj.getDistance(), 
+      m_rightEncoderObj.getDistance(), 
       new Pose2d(0, 0, new Rotation2d())
       );
 
@@ -80,28 +104,28 @@ public class DriveSubsystem extends SubsystemBase {
     m_fieldSim = new Field2d();
     SmartDashboard.putData("Field", m_fieldSim);
 
-    // m_leftEncoderSim = new EncoderSim(m_leftEncoder);
-    // m_rightEncoderSim = new EncoderSim(m_rightEncoder);
-    // m_gyroSim = new AnalogGyroSim(m_gyro);
-
-    left.setInverted(true);
-    right.setInverted(false);
-
-    m_leftA.setSmartCurrentLimit(45);
-    m_leftB.setSmartCurrentLimit(45);
-    m_rightA.setSmartCurrentLimit(45);
-    m_rightB.setSmartCurrentLimit(45);
-    //currentAngle = Math.IEEEremainder(m_gyro.getAngle(), 360);
+    m_leftEncoderSim = new EncoderSim(m_leftEncoderObj);
+    m_rightEncoderSim = new EncoderSim(m_rightEncoderObj);
+    m_gyroSim = new AnalogGyroSim(m_gyro);
+//----------------------------------------------------------------------------------------
 
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+
     m_odometry.update(
-      Rotation2d.fromDegrees(getHeading()), 
-      m_leftEncoder.getPosition(), 
+      Rotation2d.fromDegrees(getHeading()),
+      m_leftEncoder.getPosition(),
       m_rightEncoder.getPosition()
+    );
+
+    //SIMULATION---
+    m_odometrySim.update(
+      Rotation2d.fromDegrees(getHeading()), 
+      m_leftEncoderObj.getDistance(), 
+      m_rightEncoderObj.getDistance()
     );
 
     m_fieldSim.setRobotPose(getPose());
@@ -147,7 +171,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public Pose2d getPose(){
-    return m_odometry.getPoseMeters();
+    return m_odometrySim.getPoseMeters();
   }
 
   public double getPosition(){
@@ -165,11 +189,11 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public double getDisplacementX(){
-    return m_odometry.getPoseMeters().getX();
+    return m_odometrySim.getPoseMeters().getX();
   }
 
   public double getDisplacementY(){
-    return m_odometry.getPoseMeters().getY();
+    return m_odometrySim.getPoseMeters().getY();
   }
 
   public double getHeadingCase2(){//0 to 360

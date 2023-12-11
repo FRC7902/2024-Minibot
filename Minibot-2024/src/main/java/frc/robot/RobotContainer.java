@@ -8,9 +8,9 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.IOConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.DriveShape;
+import frc.robot.commands.DriveShape2;
 import frc.robot.commands.DriveToDistance;
 import frc.robot.commands.TurnToAngle;
-import frc.robot.commands.driveShape2;
 import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -28,7 +28,7 @@ public class RobotContainer {
       new RunCommand(
         () -> m_driveSubsystem.driveArcade(
           m_driverController.getRawAxis(1) * DriveConstants.speedMultiplier, 
-          m_driverController.getRawAxis(4) * DriveConstants.speedMultiplier),
+          m_driverController.getRawAxis(0) * DriveConstants.speedMultiplier),
           m_driveSubsystem
       ));    
   }
@@ -39,7 +39,7 @@ public class RobotContainer {
     new JoystickButton(m_driverController, IOConstants.kA).onTrue(new DriveToDistance(m_driveSubsystem, 5));
     new JoystickButton(m_driverController, IOConstants.kB).onTrue(new TurnToAngle(m_driveSubsystem, 90, false));
     new JoystickButton(m_driverController, IOConstants.kX).onTrue(new TurnToAngle(m_driveSubsystem, 0, false));
-    new JoystickButton(m_driverController, IOConstants.kY).onTrue(new driveShape2(m_driveSubsystem));
+    new JoystickButton(m_driverController, IOConstants.kY).onTrue(new DriveShape2(m_driveSubsystem));
 
   }
 
