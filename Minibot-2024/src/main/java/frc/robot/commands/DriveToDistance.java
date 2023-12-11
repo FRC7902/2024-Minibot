@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
@@ -68,6 +69,9 @@ public class DriveToDistance extends CommandBase {
       }
 
     }
+
+    SmartDashboard.putNumber("Current Pos", m_driveSubsystem.getDisplacementX());
+    SmartDashboard.putNumber("Target Pos", targetDistance);
 
   }
 

@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -38,8 +39,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   private final DifferentialDrive m_drive = new DifferentialDrive(left, right);
 
-  private final Encoder m_leftEncoder = new Encoder(DriveConstants.LeftEncoderCAN[0], DriveConstants.LeftEncoderCAN[1]);
-  private final Encoder m_rightEncoder = new Encoder(DriveConstants.RightEncoderCAN[0], DriveConstants.RightEncoderCAN[1]);
+  //private final Encoder m_rightEncoder = new Encoder(DriveConstants.RightEncoderCAN[0], DriveConstants.RightEncoderCAN[1]);
+
+  private final RelativeEncoder m_leftEncoder = m_leftA.getEncoder();
+  private final RelativeEncoder m_rightEncoder = m_leftB.getEncoder();
 
   private final AnalogGyro m_gyro = new AnalogGyro(DriveConstants.GyroCAN);
 
@@ -54,16 +57,16 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
-    m_leftEncoder.setDistancePerPulse(DriveConstants.WheelDiameterMeters * Math.PI / DriveConstants.EncoderTicksPerPulse);
-    m_rightEncoder.setDistancePerPulse(DriveConstants.WheelDiameterMeters * Math.PI / DriveConstants.EncoderTicksPerPulse);
+    m_leftEncoder.setPositionConversionFactor(DriveConstants.WheelDiameterMeters * Math.PI / DriveConstants.EncoderTicksPerPulse);
+    m_rightEncoder.setPositionConversionFactor(DriveConstants.WheelDiameterMeters * Math.PI / DriveConstants.EncoderTicksPerPulse);
 
-    m_leftEncoder.reset();
-    m_rightEncoder.reset();
+    m_leftEncoder.setPosition(0);
+    m_rightEncoder.setPosition(0);
 
     m_odometry = new DifferentialDriveOdometry(
       m_gyro.getRotation2d(), 
-      m_leftEncoder.getDistance(), 
-      m_rightEncoder.getDistance(), 
+      m_leftEncoder.getPosition(), 
+      m_rightEncoder.getPosition(), 
       new Pose2d(0, 0, new Rotation2d())
       );
 
@@ -77,13 +80,17 @@ public class DriveSubsystem extends SubsystemBase {
     m_fieldSim = new Field2d();
     SmartDashboard.putData("Field", m_fieldSim);
 
-    m_leftEncoderSim = new EncoderSim(m_leftEncoder);
-    m_rightEncoderSim = new EncoderSim(m_rightEncoder);
-    m_gyroSim = new AnalogGyroSim(m_gyro);
+    // m_leftEncoderSim = new EncoderSim(m_leftEncoder);
+    // m_rightEncoderSim = new EncoderSim(m_rightEncoder);
+    // m_gyroSim = new AnalogGyroSim(m_gyro);
 
     left.setInverted(true);
     right.setInverted(false);
 
+    m_leftA.setSmartCurrentLimit(45);
+    m_leftB.setSmartCurrentLimit(45);
+    m_rightA.setSmartCurrentLimit(45);
+    m_rightB.setSmartCurrentLimit(45);
     //currentAngle = Math.IEEEremainder(m_gyro.getAngle(), 360);
 
   }
@@ -93,8 +100,8 @@ public class DriveSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
     m_odometry.update(
       Rotation2d.fromDegrees(getHeading()), 
-      m_leftEncoder.getDistance(), 
-      m_rightEncoder.getDistance()
+      m_leftEncoder.getPosition(), 
+      m_rightEncoder.getPosition()
     );
 
     m_fieldSim.setRobotPose(getPose());
@@ -144,7 +151,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public double getPosition(){
-    return m_rightEncoder.getDistance();
+    return m_rightEncoder.getPosition();
   }
 
   public void turn(double power){
@@ -153,8 +160,8 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void resetEncoders(){
-    m_rightEncoder.reset();
-    m_leftEncoder.reset();
+    m_rightEncoder.setPosition(0);
+    m_leftEncoder.setPosition(0);
   }
 
   public double getDisplacementX(){
