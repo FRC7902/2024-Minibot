@@ -154,7 +154,6 @@ public class DriveSubsystem extends SubsystemBase {
     m_gyroSim.setAngle(-m_driveTrainSim.getHeading().getDegrees());
 
     SmartDashboard.putNumber("angle", getHeading());
-    SmartDashboard.putNumber("angle2", getHeadingCase2());
   }
 
   public void driveArcade(double xForward, double zRotation){
@@ -196,12 +195,8 @@ public class DriveSubsystem extends SubsystemBase {
     return m_odometrySim.getPoseMeters().getY();
   }
 
-  public double getHeadingCase2(){//0 to 360
-    if(Math.IEEEremainder(m_gyro.getAngle(), 360) < 0){
-      return Math.IEEEremainder(m_gyro.getAngle(), 360) + 360;
-    }else{
-      return Math.IEEEremainder(m_gyro.getAngle(), 360);
-    }
+  public double modAngle(double angle){
+    return Math.IEEEremainder(angle, 360);
   }
 
 }

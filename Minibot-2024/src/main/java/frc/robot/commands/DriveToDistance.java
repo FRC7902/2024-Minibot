@@ -18,6 +18,8 @@ public class DriveToDistance extends CommandBase {
   private double initialPositionX;
   private double initialPositionY;
   private double angle;
+  private double multiplier;
+  private int direction;
 
   /** Creates a new DriveToDistance. */
   public DriveToDistance(DriveSubsystem drive, double distance) {
@@ -29,7 +31,7 @@ public class DriveToDistance extends CommandBase {
     
     initialPositionX = m_driveSubsystem.getDisplacementX();
     initialPositionY = m_driveSubsystem.getDisplacementY();
-    angle = convertRange(m_driveSubsystem.getHeading());
+    angle = m_driveSubsystem.getHeading();
 
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -40,8 +42,19 @@ public class DriveToDistance extends CommandBase {
 
     initialPositionX = m_driveSubsystem.getDisplacementX();
     initialPositionY = m_driveSubsystem.getDisplacementY();
-    angle = convertRange(m_driveSubsystem.getHeading());
+    angle = m_driveSubsystem.getHeading();
 
+    if((45 < angle && angle < 135) || (-135 < angle && angle < -45)){
+      multiplier = sin(angle);
+    }else{
+      multiplier = cos(angle);
+    }
+
+    if(multiplier < 0){
+      direction = -1;
+    }else{
+      direction = 1;
+    }
 
   }
 
@@ -50,25 +63,14 @@ public class DriveToDistance extends CommandBase {
   public void execute() {
     double speed;
 
-    if((45 < angle && angle < 135) || (225 < angle && angle < 315)){
-      speed = drivePID.calculate(m_driveSubsystem.getDisplacementY(), initialPositionY + (targetDistance * sin(angle)));
 
-      if(sin(angle) < 0){
-        m_driveSubsystem.driveRaw(-speed);
-      }else{
-        m_driveSubsystem.driveRaw(speed);
-      }
-
+    if(multiplier == sin(angle)){
+      speed = drivePID.calculate(m_driveSubsystem.getDisplacementY(), initialPositionY + (targetDistance * multiplier));
     }else{
-      speed = drivePID.calculate(m_driveSubsystem.getDisplacementX(), initialPositionX + (targetDistance * cos(angle)));
-
-      if(cos(angle) < 0){
-        m_driveSubsystem.driveRaw(-speed);
-      }else{
-        m_driveSubsystem.driveRaw(speed);
-      }
-
+      speed = drivePID.calculate(m_driveSubsystem.getDisplacementX(), initialPositionX + (targetDistance * multiplier));
     }
+
+    m_driveSubsystem.driveRaw(direction * speed);
 
     SmartDashboard.putNumber("Current Pos", m_driveSubsystem.getDisplacementX());
     SmartDashboard.putNumber("Target Pos", targetDistance);
@@ -81,14 +83,6 @@ public class DriveToDistance extends CommandBase {
 
   public double sin(double angle){
     return Math.sin(Math.toRadians(angle));
-  }
-
-  public double convertRange(double angle){
-    if(angle < 0){
-      return angle + 360;
-    }else{
-      return angle;
-    }
   }
 
   // Called once the command ends or is interrupted.

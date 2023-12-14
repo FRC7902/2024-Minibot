@@ -11,12 +11,11 @@ import frc.robot.subsystems.DriveSubsystem;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class DriveShape2 extends SequentialCommandGroup {
-
-  /** Creates a new driveShape. */
+  /** Creates a new DriveShape2. */
   public DriveShape2(DriveSubsystem drive) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    addCommands(
+    addCommands(      
       new TurnToAngle(drive, 72, false),
       new DriveToDistance(drive, 1),
       new TurnToAngle(drive, 144, false),

@@ -5,87 +5,49 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class TurnToAngle extends CommandBase {
-
   private final DriveSubsystem m_driveSubsystem;
   private final double targetAngle;
   private double trueTarget;
-  private final PIDController turnPID = new PIDController(0.102, 2.04, 0.001275);
-
   private boolean isAdditive;
   private double initialAngle;
-  private int direction;
-  /** Creates a new TurnToAngleB. */
+  private final PIDController turnPID = new PIDController(0.102, 2.04, 0.001275);
+
+
+  /** Creates a new TurnToAngle. */
   public TurnToAngle(DriveSubsystem drive, double angle, boolean IsAdditive) {
+    // Use addRequirements() here to declare subsystem dependencies.
 
     m_driveSubsystem = drive;
     targetAngle = angle;
     isAdditive = IsAdditive;
     turnPID.setTolerance(0.01, 1);
+    initialAngle = m_driveSubsystem.getHeading();
 
-
-    initialAngle = convertRange(m_driveSubsystem.getHeading());
-
-    // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    initialAngle = convertRange(m_driveSubsystem.getHeading());
-
-    double trueAngle = targetAngle - initialAngle;
-
-    trueAngle = convertRange(modAngle(trueAngle));
-    
+    initialAngle = m_driveSubsystem.getHeading();
     if(isAdditive){
-      trueTarget = Math.round(convertRange(modAngle(targetAngle + initialAngle)));
+      trueTarget = Math.round(m_driveSubsystem.modAngle(targetAngle + initialAngle));
     }else{
       trueTarget = targetAngle;
     }
-
-    if(trueAngle < 180){
-      direction = 1;
-    }else{
-      direction = 1;
-    }
-
 
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-
     double speed;
+    speed = turnPID.calculate(convertRange(m_driveSubsystem.getHeading()), trueTarget);
+    m_driveSubsystem.turn(speed);
 
-    SmartDashboard.putNumber("Target angle", trueTarget);
-
-    if(trueTarget > 340 || trueTarget < 20){
-      speed = turnPID.calculate(m_driveSubsystem.getHeading(), trueTarget);//-180 to 180
-      m_driveSubsystem.turn(direction * speed);
-
-    }else{
-      speed = turnPID.calculate(convertRange(m_driveSubsystem.getHeading()), convertRange(trueTarget)); //0 to 360
-      m_driveSubsystem.turn(direction * speed);
-
-    }
-  }
-
-  public double convertRange(double angle){
-    if(angle < 0){
-      return angle + 360;
-    }else{
-      return angle;
-    }
-  }
-
-  public double modAngle(double angle){
-    return Math.IEEEremainder(angle, 360);
   }
 
   // Called once the command ends or is interrupted.
@@ -97,4 +59,15 @@ public class TurnToAngle extends CommandBase {
   public boolean isFinished() {
     return turnPID.atSetpoint();
   }
+
+  public double convertRange(double angle){//range from targetAngle +- 180
+    if(angle > trueTarget + 180){
+      return angle - 360;
+    }else if (angle < trueTarget - 180){
+      return angle +360;
+    }else{
+      return angle;
+    }
+  }
+
 }
