@@ -68,7 +68,8 @@ public class DriveSubsystem extends SubsystemBase {
     m_odometry = new DifferentialDriveOdometry(
       m_gyro.getRotation2d(), 
       m_leftEncoder.getPosition(), 
-      m_rightEncoder.getPosition()
+      m_rightEncoder.getPosition(),
+      new Pose2d(0, 0, new Rotation2d())
       );
 
     left.setInverted(true);
@@ -94,12 +95,12 @@ public class DriveSubsystem extends SubsystemBase {
       new Pose2d(0, 0, new Rotation2d())
       );
 
-      m_driveTrainSim = DifferentialDrivetrainSim.createKitbotSim(
-        KitbotMotor.kDualCIMPerSide, 
-        KitbotGearing.k10p71, 
-        KitbotWheelSize.kSixInch, 
-        null
-        );
+    m_driveTrainSim = DifferentialDrivetrainSim.createKitbotSim(
+      KitbotMotor.kDualCIMPerSide, 
+      KitbotGearing.k10p71, 
+      KitbotWheelSize.kSixInch, 
+      null
+    );
 
     m_fieldSim = new Field2d();
     SmartDashboard.putData("Field", m_fieldSim);
@@ -180,11 +181,6 @@ public class DriveSubsystem extends SubsystemBase {
   public void turn(double power){
     left.set(power);
     right.set(-power);
-  }
-
-  public void resetEncoders(){
-    m_rightEncoder.setPosition(0);
-    m_leftEncoder.setPosition(0);
   }
 
   public double getDisplacementX(){

@@ -25,7 +25,6 @@ public class DriveToDistance extends CommandBase {
   public DriveToDistance(DriveSubsystem drive, double distance) {
     m_driveSubsystem = drive;
     targetDistance = distance;
-    m_driveSubsystem.resetEncoders();
     drivePID.setTolerance(0.01, 1);
     //addRequirements(drive);
     
