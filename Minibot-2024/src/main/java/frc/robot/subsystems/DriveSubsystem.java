@@ -40,7 +40,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final DifferentialDrive m_drive = new DifferentialDrive(left, right);
 
   private final RelativeEncoder m_leftEncoder = m_leftA.getEncoder();
-  private final RelativeEncoder m_rightEncoder = m_leftB.getEncoder();
+  private final RelativeEncoder m_rightEncoder = m_rightA.getEncoder();
 
   private final AnalogGyro m_gyro = new AnalogGyro(DriveConstants.GyroCAN);
   private DifferentialDriveOdometry m_odometry;
@@ -175,7 +175,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public double getPosition(){
-    return m_rightEncoder.getPosition();
+    return m_rightEncoderObj.getDistance();
   }
 
   public void turn(double power){

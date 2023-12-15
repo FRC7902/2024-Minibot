@@ -20,6 +20,7 @@ public final class Constants {
 
   public static class DriveConstants{
 
+    public static final double DistanceBetweenWheels = 0.5;
     public static final double speedMultiplier = 1;
     public static final int[] LeftMotorCAN = {13, 14};
     public static final int[] RightMotorCAN = {11, 12};
