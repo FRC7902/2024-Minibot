@@ -26,10 +26,13 @@ public final class Constants {
     public static final int[] RightMotorCAN = {11, 12};
 
     public static final int GyroCAN = 1;
+    public static final int PigeonCAN = 30;
 
-    public static final double WheelDiameterMeters = 0.1524;
+    public static final double WheelDiameterMeters = 0.102;
 
-    public static final int EncoderTicksPerPulse = 1024;
+    public static final double gearRatio = 10.71;
+
+    public static final int EncoderTicksPerPulse = 42;
 
   }
 

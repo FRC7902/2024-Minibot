@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.sensors.PigeonIMU;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -42,8 +43,11 @@ public class DriveSubsystem extends SubsystemBase {
   private final RelativeEncoder m_leftEncoder = m_leftA.getEncoder();
   private final RelativeEncoder m_rightEncoder = m_rightA.getEncoder();
 
+  private final PigeonIMU m_pigeon = new PigeonIMU(DriveConstants.PigeonCAN);
+
   private final AnalogGyro m_gyro = new AnalogGyro(DriveConstants.GyroCAN);
   private DifferentialDriveOdometry m_odometry;
+  private Rotation2d pigeonYaw = new Rotation2d(m_pigeon.getYaw());
 
   //SIMULATION:
   private final Encoder m_leftEncoderObj = new Encoder(0, 1);
@@ -55,18 +59,19 @@ public class DriveSubsystem extends SubsystemBase {
   public DifferentialDrivetrainSim m_driveTrainSim;
   private Field2d m_fieldSim;
 
-
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
 
-    m_leftEncoder.setPositionConversionFactor(DriveConstants.WheelDiameterMeters * Math.PI / DriveConstants.EncoderTicksPerPulse);
-    m_rightEncoder.setPositionConversionFactor(DriveConstants.WheelDiameterMeters * Math.PI / DriveConstants.EncoderTicksPerPulse);
+    m_pigeon.getYaw();
+    m_leftEncoder.setPositionConversionFactor(-1 * DriveConstants.gearRatio * DriveConstants.WheelDiameterMeters * Math.PI / DriveConstants.EncoderTicksPerPulse);
+    m_rightEncoder.setPositionConversionFactor(DriveConstants.gearRatio * DriveConstants.WheelDiameterMeters * Math.PI / DriveConstants.EncoderTicksPerPulse);
 
     m_leftEncoder.setPosition(0);
     m_rightEncoder.setPosition(0);
+    m_pigeon.setYaw(0);
 
     m_odometry = new DifferentialDriveOdometry(
-      m_gyro.getRotation2d(), 
+      pigeonYaw, 
       m_leftEncoder.getPosition(), 
       m_rightEncoder.getPosition(),
       new Pose2d(0, 0, new Rotation2d())
@@ -114,6 +119,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+
     // This method will be called once per scheduler run
 
     m_odometry.update(
@@ -130,6 +136,10 @@ public class DriveSubsystem extends SubsystemBase {
     );
 
     m_fieldSim.setRobotPose(getPose());
+
+    SmartDashboard.putNumber("Encoder dist", m_rightEncoder.getPosition());
+    SmartDashboard.putNumber("yaw", m_pigeon.getYaw());
+
 
   }
 
@@ -167,7 +177,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public double getHeading(){//-180,180
-    return Math.IEEEremainder(m_gyro.getAngle(), 360);
+    return Math.IEEEremainder(m_pigeon.getYaw(), 360);
   }
 
   public Pose2d getPose(){
@@ -175,7 +185,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public double getPosition(){
-    return m_rightEncoderObj.getDistance();
+    return m_rightEncoder.getPosition();
   }
 
   public void turn(double power){
@@ -184,11 +194,11 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public double getDisplacementX(){
-    return m_odometrySim.getPoseMeters().getX();
+    return m_odometry.getPoseMeters().getX();
   }
 
   public double getDisplacementY(){
-    return m_odometrySim.getPoseMeters().getY();
+    return m_odometry.getPoseMeters().getY();
   }
 
   public double modAngle(double angle){

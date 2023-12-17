@@ -8,7 +8,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.IOConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.DriveShape;
-import frc.robot.commands.DriveShape2;
+import frc.robot.commands.driveShape2;
 import frc.robot.commands.DriveToDistance;
 import frc.robot.commands.DriveToDistanceSimple;
 import frc.robot.commands.TurnToAngle;
@@ -40,7 +40,7 @@ public class RobotContainer {
     new JoystickButton(m_driverController, IOConstants.kA).onTrue(new DriveToDistanceSimple(m_driveSubsystem, 5));
     new JoystickButton(m_driverController, IOConstants.kB).onTrue(new TurnToAngle(m_driveSubsystem, 90, true));
     new JoystickButton(m_driverController, IOConstants.kX).onTrue(new TurnToAngle(m_driveSubsystem, 0, false));
-    new JoystickButton(m_driverController, IOConstants.kY).onTrue(new DriveShape2(m_driveSubsystem));
+    new JoystickButton(m_driverController, IOConstants.kY).onTrue(new driveShape2(m_driveSubsystem));
   }
 
   /**

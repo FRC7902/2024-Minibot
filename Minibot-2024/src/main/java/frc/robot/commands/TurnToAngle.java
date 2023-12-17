@@ -14,7 +14,7 @@ public class TurnToAngle extends CommandBase {
   private double trueTarget;
   private boolean isAdditive;
   private double initialAngle;
-  private final PIDController turnPID = new PIDController(0.102, 2.04, 0.001275);
+  private final PIDController turnPID = new PIDController(0.02, 0, 0);
 
 
   /** Creates a new TurnToAngle. */
@@ -24,7 +24,7 @@ public class TurnToAngle extends CommandBase {
     m_driveSubsystem = drive;
     targetAngle = angle;
     isAdditive = IsAdditive;
-    turnPID.setTolerance(0.01, 1);
+    turnPID.setTolerance(1, 1);
     initialAngle = m_driveSubsystem.getHeading();
 
   }
